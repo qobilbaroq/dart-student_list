@@ -36,116 +36,148 @@ class _MyHomePageState extends State<MyHomePage> {
     DropdownMenuEntry(value: "female", label: "Female"),
   ];
 
-  void _showModalSheet() {
+  int? editingIndex;
+
+  void _showModalSheet({int? index}) {
+    if (index != null) {
+      editingIndex = index;
+      final student = studentList[index];
+      studentName.text = student["name"];
+      selectedClass = student["class"];
+      selectedMajor = student["major"];
+      selectedGender = student["gender"];
+      age.text = student["age"].toString();
+    } else {
+      editingIndex = null;
+    }
+
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return Container(
-          height: 600,
-          width: double.infinity,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                  "Add New Member",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: TextField(
-                  controller: studentName,
-                  decoration: InputDecoration(
-                    labelText: "Student Name",
-                    border: OutlineInputBorder(),
+        return StatefulBuilder( 
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              height: 600,
+              width: double.infinity,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      editingIndex == null ? "Add New Member" : "Edit Member", 
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
-              ),
 
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: DropdownMenu(
-                  initialSelection: selectedClass,
-                  width: double.infinity,
-                  label: Text("Class"),
-                  dropdownMenuEntries: listClasses,
-                  onSelected: (value) {
-                    setState(() {
-                      selectedClass = value!;
-                    });
-                  },
-                ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: DropdownMenu(
-                  initialSelection: selectedMajor,
-                  width: double.infinity,
-                  label: Text("Major"),
-                  dropdownMenuEntries: listMajors,
-                  onSelected: (value) {
-                    setState(() {
-                      selectedMajor = value!;
-                    });
-                  },
-                ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: DropdownMenu(
-                  initialSelection: selectedGender,
-                  width: double.infinity,
-                  label: Text("Gender"),
-                  dropdownMenuEntries: listGender,
-                  onSelected: (value) {
-                    setState(() {
-                      selectedGender = value!;
-                    });
-                  },
-                ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: TextField(
-                  controller: age,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: "Age",
-                    border: OutlineInputBorder(),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: TextField(
+                      controller: studentName,
+                      decoration: InputDecoration(
+                        labelText: "Student Name",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
                   ),
-                ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: DropdownMenu(
+                      initialSelection: selectedClass,
+                      width: double.infinity,
+                      label: Text("Class"),
+                      dropdownMenuEntries: listClasses,
+                      onSelected: (value) {
+                        setModalState(() { 
+                          selectedClass = value!;
+                        });
+                      },
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: DropdownMenu(
+                      initialSelection: selectedMajor,
+                      width: double.infinity,
+                      label: Text("Major"),
+                      dropdownMenuEntries: listMajors,
+                      onSelected: (value) {
+                        setModalState(() { 
+                          selectedMajor = value!;
+                        });
+                      },
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: DropdownMenu(
+                      initialSelection: selectedGender,
+                      width: double.infinity,
+                      label: Text("Gender"),
+                      dropdownMenuEntries: listGender,
+                      onSelected: (value) {
+                        setModalState(() { 
+                          selectedGender = value!;
+                        });
+                      },
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: TextField(
+                      controller: age,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: "Age",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        if (editingIndex == null) {
+                          studentList.add({
+                            "name": studentName.text,
+                            "class": selectedClass,
+                            "major": selectedMajor,
+                            "gender": selectedGender,
+                            "age": int.tryParse(age.text) ?? 0,
+                          });
+                        } else {
+                          studentList[editingIndex!] = {
+                            "name": studentName.text,
+                            "class": selectedClass,
+                            "major": selectedMajor,
+                            "gender": selectedGender,
+                            "age": int.tryParse(age.text) ?? 0,
+                          };
+                        }
+                      });
+
+                      Navigator.pop(context);
+
+                      studentName.clear();
+                      age.clear();
+                      editingIndex = null;
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      minimumSize: Size(double.infinity, 44),
+                    ),
+                    child: Text(
+                      editingIndex == null ? "Add Member" : "Update Member", 
+                      style: TextStyle(color: Colors.white)
+                    ),
+                  )
+                ],
               ),
-
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    studentList.add({
-                      "name": studentName.text,
-                      "class": selectedClass,
-                      "major": selectedMajor,
-                      "gender": selectedGender,
-                      "age": int.tryParse(age.text) ?? 0,
-                    });
-                  });
-
-                  Navigator.pop(context);
-
-                  studentName.clear();
-                  age.clear();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  minimumSize: Size(double.infinity, 44),
-                ),
-                child: Text("Add Member", style: TextStyle(color: Colors.white)),
-              )
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -173,6 +205,15 @@ class _MyHomePageState extends State<MyHomePage> {
               major: item["major"],
               gender: item["gender"],
               age: item["age"],
+              onEdit: () {
+                _showModalSheet(index: index);
+              },
+              onDelete: () {
+                setState(() {
+                  studentList.removeAt(index);
+                });
+              },
+              
             );
           },
         ),

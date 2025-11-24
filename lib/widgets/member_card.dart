@@ -8,6 +8,8 @@ class MemberCard extends StatelessWidget {
     required this.major,
     required this.gender,
     required this.age,
+    required this.onEdit,
+    required this.onDelete,
   });
 
   String name = "";
@@ -15,6 +17,8 @@ class MemberCard extends StatelessWidget {
   String major = "";
   String gender = "";
   int age = 0;
+  VoidCallback onEdit;
+  VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -38,12 +42,12 @@ class MemberCard extends StatelessWidget {
               children: [
                 IconButton(
                   color: Colors.yellowAccent[700],
-                  onPressed: () {},
+                  onPressed: onEdit,
                   icon: Icon(Icons.edit),
                 ),
                 IconButton(
                   color: Colors.redAccent[700],
-                  onPressed: () {},
+                  onPressed: onDelete,
                   icon: Icon(Icons.delete),
                 ),
               ],
